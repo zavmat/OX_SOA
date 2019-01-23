@@ -27,7 +27,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 @Path("/request")
 public class RequestApi  {
 
-  
+    RequestBackend backend = new RequestBackend();
+
 
     /**
      * Deletes an existing request
