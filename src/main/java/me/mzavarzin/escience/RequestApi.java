@@ -9,6 +9,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
+import org.springframework.stereotype.Component;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -22,8 +23,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
  * <p>eScience system. Created s part of the Oxford Software Engineering Program SOA Course assignment. Intended to model a scientific experiment replication service
  *
  */
+@Component
 @Path("/request")
 public class RequestApi  {
+
+  
 
     /**
      * Deletes an existing request
@@ -32,7 +36,7 @@ public class RequestApi  {
      *
      */
     @DELETE
-    @Path("/request/{id}")
+    @Path("/{id}")
     @Operation(summary = "Deletes an existing request", tags={  })
     @ApiResponses(value = { 
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -48,7 +52,7 @@ public class RequestApi  {
      *
      */
     @GET
-    @Path("/request/{id}")
+    @Path("/{id}")
     @Produces({ "application/json" })
     @Operation(summary = "Returns a request by id", tags={  })
     @ApiResponses(value = { 
@@ -65,13 +69,16 @@ public class RequestApi  {
      *
      */
     @GET
-    @Path("/request")
+    @Path("/")
     @Produces({ "application/json" })
     @Operation(summary = "Returns all requests in the system", tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "A list of Requests", content = @Content(schema = @Schema(implementation = Requests.class))) })
+        @ApiResponse(responseCode = "200", description = "A list of Requests", content = @Content(schema = @Schema(implementation = RequestList.class))) })
+    
+
+    
     public Response getRequests(){
-        return Response.ok().entity("TO-DO").build();
+        return Response.ok().entity("Ola!").build();
     }
 
     /**
@@ -81,7 +88,7 @@ public class RequestApi  {
      *
      */
     @POST
-    @Path("/request")
+    @Path("/")
     @Produces({ "application/json" })
     @Operation(summary = "Create a new requests in the system", tags={  })
     @ApiResponses(value = { 
@@ -90,7 +97,9 @@ public class RequestApi  {
     public Response postRequest(){
         return Response.ok().entity("TO-DO").build();
     }
-
+    
+   
+        
     /**
      * Updates an existing request
      *
@@ -98,7 +107,7 @@ public class RequestApi  {
      *
      */
     @PUT
-    @Path("/request/{id}")
+    @Path("/{id}")
     @Produces({ "application/json" })
     @Operation(summary = "Updates an existing request", tags={  })
     @ApiResponses(value = { 
@@ -117,7 +126,7 @@ public class RequestApi  {
      *
      */
     @GET
-    @Path("/request/{id}/run")
+    @Path("/{id}/run")
     @Produces({ "application/json" })
     @Operation(summary = "Runs a request", tags={  })
     @ApiResponses(value = { 

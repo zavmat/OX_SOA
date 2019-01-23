@@ -1,6 +1,6 @@
 package me.mzavarzin.escience;
 
-import me.mzavarzin.escience.RequestsInner;
+import me.mzavarzin.escience.Request;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
-public class Requests extends ArrayList<RequestsInner> {
+public class RequestList extends ArrayList<Request> {
 
   @Override
   public String toString() {
