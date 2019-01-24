@@ -1,5 +1,9 @@
 package me.mzavarzin.escience;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.UUID;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -7,8 +11,12 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
+import org.json.JSONException;
 import org.springframework.stereotype.Component;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +37,53 @@ public class RequestApi  {
 
     RequestBackend backend = new RequestBackend();
 
+
+    /**
+     * Create a new requests in the system
+     *
+     * Create a new request in the system
+     *
+     */
+    @POST
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Create a new requests in the system", tags={  })
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "201", description = "Request created", content = @Content(schema = @Schema(implementation = Request.class))),
+        @ApiResponse(responseCode = "400", description = "Invalid request supplied") })
+    public Response postRequest(String input, @Context UriInfo ui) throws JSONException, NotFoundException, IOException{
+        String uuid = null;
+        
+        System.out.println("0-POST Initiate createrequest on backend");
+	    uuid = backend.createRequest(input);
+		System.out.println("5-POST Back to postRequest in Request API");
+        URI location = ui.getAbsolutePathBuilder().path(uuid).build();
+        System.out.println("6-POST Call get request");
+        String response = backend.getRequest(uuid).toString();
+        System.out.println(response);
+        return Response.created(location).entity(response).build();
+    }
+
+      /**
+     * Returns all requests in the system
+     *
+     * Returns all requests in the system
+     *
+     */
+    @GET
+    @Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Returns all requests in the system", tags={  })
+    @ApiResponses(value = { 
+        @ApiResponse(responseCode = "200", description = "A list of Requests" , content = @Content(schema = @Schema(implementation = Request.class))) })
+    
+
+    
+    public Response getRequests(){
+        return Response.ok().entity("{" + "\"id\" : \"ff64acd5-1af4-4f1f-b9b7-7fa6c422373\"" +"}").build();
+    }
+
+    
 
     /**
      * Deletes an existing request
@@ -62,44 +117,6 @@ public class RequestApi  {
     public Response getRequestById(@PathParam("id") String id){
         return Response.ok().entity("TO-DO").build();
     }
-
-    /**
-     * Returns all requests in the system
-     *
-     * Returns all requests in the system
-     *
-     */
-    @GET
-    @Path("/")
-    @Produces({ "application/json" })
-    @Operation(summary = "Returns all requests in the system", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "A list of Requests", content = @Content(schema = @Schema(implementation = RequestList.class))) })
-    
-
-    
-    public Response getRequests(){
-        return Response.ok().entity("Ola!").build();
-    }
-
-    /**
-     * Create a new requests in the system
-     *
-     * Create a new request in the system
-     *
-     */
-    @POST
-    @Path("/")
-    @Produces({ "application/json" })
-    @Operation(summary = "Create a new requests in the system", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Request created", content = @Content(schema = @Schema(implementation = Request.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid request supplied") })
-    public Response postRequest(){
-        return Response.ok().entity("TO-DO").build();
-    }
-    
-   
         
     /**
      * Updates an existing request
