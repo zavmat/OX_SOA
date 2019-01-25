@@ -27,7 +27,7 @@ public class RequestBackend {
 			+ "\"containerId\" : \"520705b5-39ba-40a7-9b5b-32b0500315e2\","
 			+ "\"datasetId\" : \"ab525811-6027-4fef-97e0-f7d062173e61\","
 			+ "\"jobId\" : \"0f19b1da-6bc9-4149-a038-d7694bae6831\","
-			+ "\"resultId\" : \"3a55a4b0-0dba-4065-b597-1e4f40366ed2\"," + "\"status\" : \"created\"," + "}";
+			+ "\"resultId\" : \"3a55a4b0-0dba-4065-b597-1e4f40366ed2\"," + "\"status\" : \"created\"" + "}";
 
 	/*
 	 * Instantiate system with example data
@@ -151,4 +151,3 @@ public class RequestBackend {
 	}
 	
 }
-
