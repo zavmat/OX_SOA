@@ -2,8 +2,7 @@ package me.mzavarzin.escience;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.json.JSONArray;
@@ -13,12 +12,9 @@ import org.json.JSONObject;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 
 public class RequestBackend {
 
-	private static final String STRING = "}";
 	public static JedisPool pool = new JedisPool(new JedisPoolConfig(),
 			System.getenv().containsKey("REDIS_HOST") ? System.getenv("REDIS_HOST") : "localhost");
 	public static String oneuuid = UUID.randomUUID().toString();
@@ -53,11 +49,8 @@ public class RequestBackend {
 
 	public String createRequest(String request) throws IOException {
 		String uuid = UUID.randomUUID().toString();
-		System.out.println("1-Backend create request construct new request from input json");
 		Request entry = new Request(request);
-		System.out.println("3-Adding request to redis");
 		putRequestToRedis(uuid, entry.toJSON().toString());
-		System.out.println("4-Done request in redis");
 		return uuid;
 	}
 
@@ -72,9 +65,9 @@ public class RequestBackend {
 		if (!isKeyInRedis(id))
 			throw new NotFoundException();
 
-		System.out.println("Get request from redis by key: "+ id);
-		String entry = getRequestFromRedis(id);
 		
+		String entry = getRequestFromRedis(id);
+			System.out.println("Get request format from redis by key: "+ entry);
 			return entry;
 	}
 
@@ -89,9 +82,9 @@ public class RequestBackend {
 		}
 	}
 
-	public boolean isOrderInRedis(String uuid) {
+	public boolean isRequestInRedis(String uuid) {
 		try (Jedis jedis = pool.getResource()) {
-			return jedis.exists(uuid + ":json");
+			return jedis.exists(uuid);
 		}
 	}
 
@@ -101,5 +94,55 @@ public class RequestBackend {
 			return jedis.exists(uuid);
 		}
 	}
+
+	public String getRequests() throws IOException{
+		JSONArray array = new JSONArray();
+		Set<String> keys = getRequestIDs();
+
+		Iterator<String> i = keys.iterator();
+		while (i.hasNext()) {
+			String uuid = i.next();
+
+			try {
+				String entry = getRequestFromRedis(uuid);
+				System.out.println("Entry "+ i +": "+ entry);
+				Request r = new Request(entry);
+
+				JSONObject href = new JSONObject();
+
+				href.put("href", uuid);
+				href.put("name", r.getName());
+				array.put(href);
+
+				
+				} catch (NotFoundException nfe) {
+				// serious error here
+				}
+		}
+
+		JSONObject json = new JSONObject();
+
+		json.put("requests", array);
+		return json.toString(3); // indent 3 for nicer printing!
+	}
+
+	private Set<String> getRequestIDs() {
+		try (Jedis jedis = pool.getResource()) {
+			
+			Set<String> uuids = jedis.keys("*");
+			System.out.println("uuids: "+ uuids);
+			return uuids;
+		}
+	}
+
+	public void updateRequest(String uuid, String input) throws IOException, NotFoundException {
+		if (uuid == null || !isRequestInRedis(uuid)) {
+			throw new NotFoundException();
+		}
+
+		putRequestToRedis(uuid, input);
+
+	}
+	
 }
 

@@ -109,7 +109,6 @@ public class Request  {
 
 public Request(String json) throws JSONException {
   
-  System.out.println("2-Creating request from JSON");
   JSONObject j = new JSONObject(new JSONTokener(json.trim()));
   System.out.println(j);
 
