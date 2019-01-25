@@ -82,17 +82,29 @@ public class RequestApi  {
      * Deletes an existing request
      *
      * Deletes and existing request
+     * 
+     * @return
      *
      */
     @DELETE
     @Path("/{id}")
-    @Operation(summary = "Deletes an existing request", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "OK"),
-        @ApiResponse(responseCode = "404", description = "Request not found") })
-    public void deleteOrder(@PathParam("id") String id){
-
-    }
+    @Operation(summary = "Deletes an existing request", tags = {})
+    @ApiResponses(value = { @ApiResponse(responseCode = "200", description = "OK"),
+            @ApiResponse(responseCode = "404", description = "Request not found") })
+    public Response deleteRequest(@PathParam("id") String id) {
+        try {
+			boolean deleted = backend.deleteRequest(id);
+			if (deleted) {
+				return Response.status(Status.OK).build();
+            }
+            else{
+                throw new NotFoundException();
+            }
+		    } catch ( NotFoundException e) {
+			    return Response.status(Status.NOT_FOUND).build();
+            }
+        }	
+    
 
     /**
      * Returns a request by id -OK

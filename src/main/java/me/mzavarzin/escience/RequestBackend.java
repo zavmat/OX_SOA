@@ -19,28 +19,20 @@ public class RequestBackend {
 			System.getenv().containsKey("REDIS_HOST") ? System.getenv("REDIS_HOST") : "localhost");
 	public static String oneuuid = UUID.randomUUID().toString();
 
-/**
- * Example JSON of Request
- */
-	String jsonExampleData = 
-			    "{"
-				  +"\"id\" : \"ff64acd5-1af4-4f1f-b9b7-7fa6c422373\","
-				  +"\"name\" : \"DNS Sequencing\","
-				  +"\"userId\" : \"94b90ab9-661a-4fca-ad7e-99fd7b51c1a7\","
-				  +"\"containerId\" : \"520705b5-39ba-40a7-9b5b-32b0500315e2\","
-				  +"\"datasetId\" : \"ab525811-6027-4fef-97e0-f7d062173e61\","
-				  +"\"jobId\" : \"0f19b1da-6bc9-4149-a038-d7694bae6831\","
-				  +"\"resultId\" : \"3a55a4b0-0dba-4065-b597-1e4f40366ed2\","
-				  +"\"status\" : \"created\","
-			   +"}";
-
+	/**
+	 * Example JSON of Request
+	 */
+	String jsonExampleData = "{" + "\"id\" : \"ff64acd5-1af4-4f1f-b9b7-7fa6c422373\","
+			+ "\"name\" : \"DNS Sequencing\"," + "\"userId\" : \"94b90ab9-661a-4fca-ad7e-99fd7b51c1a7\","
+			+ "\"containerId\" : \"520705b5-39ba-40a7-9b5b-32b0500315e2\","
+			+ "\"datasetId\" : \"ab525811-6027-4fef-97e0-f7d062173e61\","
+			+ "\"jobId\" : \"0f19b1da-6bc9-4149-a038-d7694bae6831\","
+			+ "\"resultId\" : \"3a55a4b0-0dba-4065-b597-1e4f40366ed2\"," + "\"status\" : \"created\"," + "}";
 
 	/*
 	 * Instantiate system with example data
 	 */
-	public RequestBackend(){
-
-	
+	public RequestBackend() {
 
 		try (Jedis jedis = pool.getResource()) {
 			jedis.set(oneuuid, jsonExampleData);
@@ -54,9 +46,9 @@ public class RequestBackend {
 		return uuid;
 	}
 
-	public void putRequestToRedis(String k, String v) throws IOException{
+	public void putRequestToRedis(String k, String v) throws IOException {
 		try (Jedis jedis = pool.getResource()) {
-			jedis.set(k,v);
+			jedis.set(k, v);
 		}
 
 	}
@@ -65,10 +57,9 @@ public class RequestBackend {
 		if (!isKeyInRedis(id))
 			throw new NotFoundException();
 
-		
 		String entry = getRequestFromRedis(id);
-			System.out.println("Get request format from redis by key: "+ entry);
-			return entry;
+		System.out.println("Get request format from redis by key: " + entry);
+		return entry;
 	}
 
 	public String getRequestFromRedis(String uuid) throws NotFoundException, IOException {
@@ -95,7 +86,7 @@ public class RequestBackend {
 		}
 	}
 
-	public String getRequests() throws IOException{
+	public String getRequests() throws IOException {
 		JSONArray array = new JSONArray();
 		Set<String> keys = getRequestIDs();
 
@@ -105,7 +96,7 @@ public class RequestBackend {
 
 			try {
 				String entry = getRequestFromRedis(uuid);
-				System.out.println("Entry "+ i +": "+ entry);
+				System.out.println("Entry " + i + ": " + entry);
 				Request r = new Request(entry);
 
 				JSONObject href = new JSONObject();
@@ -114,10 +105,9 @@ public class RequestBackend {
 				href.put("name", r.getName());
 				array.put(href);
 
-				
-				} catch (NotFoundException nfe) {
+			} catch (NotFoundException nfe) {
 				// serious error here
-				}
+			}
 		}
 
 		JSONObject json = new JSONObject();
@@ -128,9 +118,9 @@ public class RequestBackend {
 
 	private Set<String> getRequestIDs() {
 		try (Jedis jedis = pool.getResource()) {
-			
+
 			Set<String> uuids = jedis.keys("*");
-			System.out.println("uuids: "+ uuids);
+			System.out.println("uuids: " + uuids);
 			return uuids;
 		}
 	}
@@ -142,6 +132,22 @@ public class RequestBackend {
 
 		putRequestToRedis(uuid, input);
 
+	}
+
+	public boolean deleteRequest(String id) throws NotFoundException {
+		if (isRequestInRedis(id)) {
+
+			try {
+				String entry = getRequestFromRedis(id);
+			} catch (NotFoundException | IOException e) {
+				throw new NotFoundException();
+			}
+			Jedis jedis = pool.getResource();
+			jedis.del(id);
+			return true;
+		} else {
+			throw new NotFoundException();
+		}
 	}
 	
 }
