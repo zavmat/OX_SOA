@@ -17,6 +17,5 @@ public class RequestConfiguration extends ResourceConfig {
 	public void setUp() {
 		register(RequestApi.class);
         register(OpenApiResource.class);
-        System.out.println("Hello RequestConf");
 	}
 }
