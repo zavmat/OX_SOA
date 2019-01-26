@@ -30,5 +30,8 @@ dependencies {
 	implementation('io.swagger.core.v3:swagger-jaxrs2:2.0.6')
 	implementation('io.swagger.core.v3:swagger-models:2.0.6')
 	implementation('io.swagger.core.v3:swagger-jaxrs2-servlet-initializer:2.0.6')
+	implementation('com.microsoft.azure:azure-core:0.9.8')
+	implementation('commons-cli:commons-cli:1.4')
+	implementation('com.microsoft.azure:azure-servicebus:1.2.8')
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }

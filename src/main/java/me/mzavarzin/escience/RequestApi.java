@@ -36,7 +36,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class RequestApi  {
 
     RequestBackend backend = new RequestBackend();
-
+    RequestQueue queueback = new RequestQueue();
+    static final String SB_SAMPLES_CONNECTIONSTRING = "Endpoint=sb://escience.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=A1SJAoPiNeMz+XoyWOtnf6+trlA3RcaFRD4ky639IK4=";
+    static final String SB_SAMPLES_QUEUE = "requests";
+    
+   
+    
+    
 
     /**
      * Create a new requests in the system - OK
@@ -75,7 +81,7 @@ public class RequestApi  {
         System.out.println("All requests: "+allRequests);
         return Response.ok().entity(allRequests).build();
     }
-
+    
     
 
     /**
@@ -171,6 +177,13 @@ public class RequestApi  {
         @ApiResponse(responseCode = "405", description = "Operation on this request is not allowed") })
     public Response runRequest(@PathParam("id") String id){
     
-        return Response.ok().entity("TO-DO").build();
+        try {
+            queueback.run(SB_SAMPLES_CONNECTIONSTRING,SB_SAMPLES_QUEUE);
+            
+        } catch (Exception e) {
+            System.out.printf("%s", e.toString());
+           
+        }
+        return Response.ok().entity("Cool").build();
     }
 }
