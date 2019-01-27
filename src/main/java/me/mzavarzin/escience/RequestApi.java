@@ -36,7 +36,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class RequestApi  {
 
     RequestBackend backend = new RequestBackend();
-    RequestQueue queueback = new RequestQueue();
+    RequestQueue queue = new RequestQueue();
     static final String SB_SAMPLES_CONNECTIONSTRING = "Endpoint=sb://escience.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=A1SJAoPiNeMz+XoyWOtnf6+trlA3RcaFRD4ky639IK4=";
     static final String SB_SAMPLES_QUEUE = "requests";
     
@@ -178,12 +178,12 @@ public class RequestApi  {
     public Response runRequest(@PathParam("id") String id){
     
         try {
-            queueback.run(SB_SAMPLES_CONNECTIONSTRING,SB_SAMPLES_QUEUE);
+            queue.run(SB_SAMPLES_CONNECTIONSTRING,SB_SAMPLES_QUEUE);
             
         } catch (Exception e) {
             System.out.printf("%s", e.toString());
            
         }
-        return Response.ok().entity("Cool").build();
+        return Response.ok().entity("Request scheduled to run").build();
     }
 }

@@ -230,12 +230,12 @@ public class RequestApplicationTests {
     	assertEquals(name, jsonResponse.get("name"));
     	System.out.println(jsonResponse.get("name"));
 		
-		/*
+		
 		// validate sending incomplete or bad JSON
     	response = target.request(MediaType.APPLICATION_JSON)
     			.put(Entity.entity("{blah}",MediaType.APPLICATION_JSON));
 		assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-		*/
+		
     }
     
 	@Test 

@@ -129,8 +129,10 @@ public class RequestBackend {
 		if (uuid == null || !isRequestInRedis(uuid)) {
 			throw new NotFoundException();
 		}
-
-		putRequestToRedis(uuid, input);
+		Request r = new Request(input);
+		String value = r.toJSON().toString();
+		System.out.println("Putting JSON to Redis: "+value);
+		putRequestToRedis(uuid, value);
 
 	}
 
