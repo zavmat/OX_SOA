@@ -151,5 +151,35 @@ public class RequestBackend {
 			throw new NotFoundException();
 		}
 	}
+
+	public void setScheduled(String id) throws NotFoundException {
+		if (isRequestInRedis(id)) {
+
+			try {	
+				String entry = getRequestFromRedis(id);
+				Request r = new Request(entry);
+				r.setStatus("scheduled");
+				String input=r.toJSON().toString();
+				
+				putRequestToRedis(id, input);
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
+	}
+	else throw new NotFoundException();
+}
+
+	public boolean isAllowed(String id) throws JSONException, NotFoundException, IOException {
+		if (isKeyInRedis(id)) {
+			Request r = new  Request(getRequestFromRedis(id));
+			System.out.println(r.isStatusCreated());
+			if (! r.isStatusCreated()) return false;	
+		}
+		return true;
+	}
+
+	
 	
 }
