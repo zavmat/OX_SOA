@@ -141,4 +141,9 @@ public JSONObject toJSON() {
 		return null;
 	}
 
+public boolean isStatusCreated() {
+  if(this.status=="created") return true;
+	else return false;
+}
+
 }

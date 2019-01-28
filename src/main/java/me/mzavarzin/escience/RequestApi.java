@@ -28,55 +28,58 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 /**
  * escience
  *
- * <p>eScience system. Created s part of the Oxford Software Engineering Program SOA Course assignment. Intended to model a scientific experiment replication service
+ * <p>
+ * eScience system. Created s part of the Oxford Software Engineering Program
+ * SOA Course assignment. Intended to model a scientific experiment replication
+ * service
  *
  */
 @Component
 @Path("/request")
-public class RequestApi  {
+public class RequestApi {
 
     RequestBackend backend = new RequestBackend();
-
+    RequestQueue queue = new RequestQueue();
+    static final String SB_SAMPLES_CONNECTIONSTRING = "Endpoint=sb://escience.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=A1SJAoPiNeMz+XoyWOtnf6+trlA3RcaFRD4ky639IK4=";
+    static final String SB_SAMPLES_QUEUE = "requests";
 
     /**
      * Create a new requests in the system - OK
      */
     @POST
-	@Path("/")
-	@Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Create a new requests in the system", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "201", description = "Request created", content = @Content(schema = @Schema(implementation = Request.class))),
-        @ApiResponse(responseCode = "400", description = "Invalid request supplied") })
-    public Response postRequest(String input, @Context UriInfo ui) throws JSONException, NotFoundException, IOException{
-        String uuid = null; 
-        try{
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Create a new requests in the system", tags = {})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Request created", content = @Content(schema = @Schema(implementation = Request.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request supplied") })
+    public Response postRequest(String input, @Context UriInfo ui)
+            throws JSONException, NotFoundException, IOException {
+        String uuid = null;
+        try {
             uuid = backend.createRequest(input);
         } catch (JSONException je) {
-            return Response.status(400).build(); 
+            return Response.status(400).build();
         }
-		URI location = ui.getAbsolutePathBuilder().path(uuid).build();
+        URI location = ui.getAbsolutePathBuilder().path(uuid).build();
         String response = backend.getRequest(uuid).toString();
         return Response.created(location).entity(response).build();
     }
 
-      /**
+    /**
      * Returns all requests in the system
      */
     @GET
     @Path("/")
-	@Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Returns all requests in the system", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "A list of Requests" , content = @Content(schema = @Schema(implementation = Request.class))) })
-        
-    public Response getRequests() throws IOException{
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Returns all requests in the system", tags = {})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "A list of Requests", content = @Content(schema = @Schema(implementation = Request.class))) })
+
+    public Response getRequests() throws IOException {
         String allRequests = backend.getRequests();
-        System.out.println("All requests: "+allRequests);
         return Response.ok().entity(allRequests).build();
     }
-
-    
 
     /**
      * Deletes an existing request
@@ -93,18 +96,16 @@ public class RequestApi  {
             @ApiResponse(responseCode = "404", description = "Request not found") })
     public Response deleteRequest(@PathParam("id") String id) {
         try {
-			boolean deleted = backend.deleteRequest(id);
-			if (deleted) {
-				return Response.status(Status.OK).build();
-            }
-            else{
+            boolean deleted = backend.deleteRequest(id);
+            if (deleted) {
+                return Response.status(Status.OK).build();
+            } else {
                 throw new NotFoundException();
             }
-		    } catch ( NotFoundException e) {
-			    return Response.status(Status.NOT_FOUND).build();
-            }
-        }	
-    
+        } catch (NotFoundException e) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+    }
 
     /**
      * Returns a request by id -OK
@@ -112,21 +113,21 @@ public class RequestApi  {
     @GET
     @Path("/{id}")
     @Produces({ "application/json" })
-    @Operation(summary = "Returns a request by id", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Request found", content = @Content(schema = @Schema(implementation = Request.class))),
-        @ApiResponse(responseCode = "404", description = "Request not found") })
-    public Response getRequestById(@PathParam("id") String id) throws IOException{
+    @Operation(summary = "Returns a request by id", tags = {})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Request found", content = @Content(schema = @Schema(implementation = Request.class))),
+            @ApiResponse(responseCode = "404", description = "Request not found") })
+    public Response getRequestById(@PathParam("id") String id) throws IOException {
         String requestJSON;
         try {
             requestJSON = backend.getRequest(id);
             // returns a JSON string based on a UUID
-        } catch ( NotFoundException e) {
+        } catch (NotFoundException e) {
             return Response.status(404).build();
-        } 
-        return Response.ok().entity(requestJSON.toString()).build();
         }
-        
+        return Response.ok().entity(requestJSON.toString()).build();
+    }
+
     /**
      * Updates an existing request
      * 
@@ -145,32 +146,55 @@ public class RequestApi  {
     public Response putOrder(String input, @PathParam("id") String id)
             throws JSONException, NotFoundException, IOException {
         String requestJSON;
-		try {
-            System.out.println("Got this id:" + id);
-			backend.updateRequest(id, input);
-		// this updates an order - takes a UUID and a JSON string
-		} catch (JSONException je) {
-				return Response.status(Status.BAD_REQUEST).build();
-		} catch (IOException e) {
-                return Response.status(Status.BAD_REQUEST).build();    
+        try {
+            backend.updateRequest(id, input);
+            // this updates an order - takes a UUID and a JSON string
+        } catch (JSONException je) {
+            return Response.status(Status.BAD_REQUEST).build();
+        } catch (IOException e) {
+            return Response.status(Status.BAD_REQUEST).build();
         } catch (NotFoundException e) {
-            return Response.status(Status.NOT_FOUND).build();   
+            return Response.status(Status.NOT_FOUND).build();
         }
         requestJSON = backend.getRequest(id);
-        System.out.println(requestJSON.toString());
-		return Response.ok().entity(requestJSON).build();
-	}
+        return Response.ok().entity(requestJSON).build();
+    }
 
     @GET
     @Path("/{id}/run")
     @Produces({ "application/json" })
-    @Operation(summary = "Runs a request", tags={  })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "202", description = "Request scheduled to run", content = @Content(schema = @Schema(implementation = Request.class))),
-        @ApiResponse(responseCode = "404", description = "Request not found"),
-        @ApiResponse(responseCode = "405", description = "Operation on this request is not allowed") })
-    public Response runRequest(@PathParam("id") String id){
+    @Operation(summary = "Runs a request", tags = {})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Request scheduled to run", content = @Content(schema = @Schema(implementation = Request.class))),
+            @ApiResponse(responseCode = "404", description = "Request not found"),
+            @ApiResponse(responseCode = "405", description = "Operation on this request is not allowed") })
+    public Response runRequest(@PathParam("id") String id, @Context UriInfo ui)
+            throws JSONException, NotFoundException, IOException {
+        
+        String requestJSON=null;
+       
+            System.out.println(backend.isAllowed(id));
+            if (backend.isAllowed(id)) {
+                try {
+                    requestJSON=backend.getRequest(id);
+                    queue.run(SB_SAMPLES_CONNECTIONSTRING,SB_SAMPLES_QUEUE,requestJSON, id);
+                    backend.setScheduled(id);
+                    requestJSON= backend.getRequest(id);
+                    
+                } catch (Exception e) {
+                    System.out.printf("%s", e.toString());
+                   
+                }
+                
+                
+            } else {
+                return Response.status(Status.METHOD_NOT_ALLOWED).build();
+            }
+       
+     
     
-        return Response.ok().entity("TO-DO").build();
+        
+        URI location = ui.getAbsolutePathBuilder().path(id).build();
+        return Response.ok("Request scheduled to run").entity(requestJSON).build();
     }
 }

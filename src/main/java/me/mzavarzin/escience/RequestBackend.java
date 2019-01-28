@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class RequestBackend {
-
+	
 	public static JedisPool pool = new JedisPool(new JedisPoolConfig(),
 			System.getenv().containsKey("REDIS_HOST") ? System.getenv("REDIS_HOST") : "localhost");
 	public static String oneuuid = UUID.randomUUID().toString();
@@ -129,8 +129,10 @@ public class RequestBackend {
 		if (uuid == null || !isRequestInRedis(uuid)) {
 			throw new NotFoundException();
 		}
-
-		putRequestToRedis(uuid, input);
+		Request r = new Request(input);
+		String value = r.toJSON().toString();
+		System.out.println("Putting JSON to Redis: "+value);
+		putRequestToRedis(uuid, value);
 
 	}
 
@@ -149,5 +151,35 @@ public class RequestBackend {
 			throw new NotFoundException();
 		}
 	}
+
+	public void setScheduled(String id) throws NotFoundException {
+		if (isRequestInRedis(id)) {
+
+			try {	
+				String entry = getRequestFromRedis(id);
+				Request r = new Request(entry);
+				r.setStatus("scheduled");
+				String input=r.toJSON().toString();
+				
+				putRequestToRedis(id, input);
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
+	}
+	else throw new NotFoundException();
+}
+
+	public boolean isAllowed(String id) throws JSONException, NotFoundException, IOException {
+		if (isKeyInRedis(id)) {
+			Request r = new  Request(getRequestFromRedis(id));
+			System.out.println(r.isStatusCreated());
+			if (! r.isStatusCreated()) return false;	
+		}
+		return true;
+	}
+
+	
 	
 }
