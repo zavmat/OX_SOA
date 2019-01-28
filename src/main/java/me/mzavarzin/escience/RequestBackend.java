@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class RequestBackend {
-
+	
 	public static JedisPool pool = new JedisPool(new JedisPoolConfig(),
 			System.getenv().containsKey("REDIS_HOST") ? System.getenv("REDIS_HOST") : "localhost");
 	public static String oneuuid = UUID.randomUUID().toString();
