@@ -1,8 +1,19 @@
-version: '2.1'
+version: '2'
 
 services:
   escience:
-    image: escience
-    build: .
+    image: escience.azurecr.io/escience
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
-      - 80:80
+     - "80:8080"
+    links:
+     - "redis:redis"
+    depends_on:
+     - redis
+  redis:
+    image: escience.azurecr.io/redis:3.2.8-alpine
+    container_name: redis
+    ports:
+    - "6379:6379"
